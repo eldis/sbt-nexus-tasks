@@ -54,9 +54,9 @@ Expires the cache on Nexus Proxy repository corresponding to the current module.
 It's sometimes useful to trigger it automatically on publish:
 
 ```scala
-publish in Compile := {
-  publish.in(Compile).value
-  nexusExpireProxyCache.in(Compile).value
+publish := {
+  nexusExpireProxyCache.in(Compile)
+    .dependsOn(publish).value
 }
 ```
 
