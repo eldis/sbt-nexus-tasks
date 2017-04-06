@@ -7,6 +7,8 @@ Tasks for managing Nexus server from SBT.
 Add the following to your `project/plugins.sbt`:
 
 ```scala
+resolvers += Opts.resolver.sonatypeSnapshots
+
 addSbtPlugin("com.github.eldis" % "sbt-nexus-tasks" % "0.1.0-SNAPSHOT")
 ```
 
