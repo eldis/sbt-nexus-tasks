@@ -11,37 +11,40 @@ package object impl {
     * Expire an artifact in Nexus proxy cache.
     */
   def expireProxyCache(
-    root: URL,
-    domain: Domain,
-    target: String,
+    settings: NexusSettings,
+    args: ExpireProxyCacheArgs,
     group: String,
     artifact: String,
-    credentials: NexusCredentials,
+    version: String,
     log: Logger
   ) = {
-    assert(!target.contains("/"))
+    assert(!args.target.contains("/"))
+
+    val NexusSettings(root, NexusCredentials(username, password)) = settings
+
     val pathFragments = Seq(
       "service/local/data_cache",
-      domainToString(domain),
-      target,
+      domainToString(args.domain),
+      args.target,
       "content",
       toPathFragment(group),
-      artifact
+      artifact,
+      version
     )
     val url = pathFragments.foldLeft(root)(combineUrl)
     log.info("Expiring on URL: " + url)
 
     val resp = Http(url.toString)
       .method("DELETE")
-      .auth(credentials.username, credentials.password)
+      .auth(username, password)
       .timeout(3000, 30000)
       .asString
       .throwError
   }
 
   private def domainToString(d: Domain): String = d match {
-    case Domain.Repositories => "repositories"
-    case Domain.RepoGroups => "repo_groups"
+    case Domain.Repository => "repositories"
+    case Domain.Group => "repo_groups"
   }
 
   private def toPathFragment(group: String): String =
